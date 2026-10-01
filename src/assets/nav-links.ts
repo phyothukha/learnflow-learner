@@ -1,8 +1,5 @@
 import {
   LayoutDashboard,
-  BookOpen,
-  Users,
-  FolderOpen,
   NotebookPen,
   SquareKanban,
   type LucideIcon,
@@ -31,28 +28,10 @@ export const navLinks: NavLinkGroup[] = [
         requiredPermissions: [PERMISSIONS.DASHBOARD_VIEW],
       },
       {
-        title: "Courses",
-        href: "/courses",
-        icon: BookOpen,
-        requiredPermissions: [PERMISSIONS.COURSES_VIEW],
-      },
-      {
-        title: "Enrollments",
-        href: "/enrollments",
-        icon: Users,
-        requiredPermissions: [PERMISSIONS.ENROLLMENTS_VIEW],
-      },
-      {
         title: "Tasks",
         href: "/tasks",
         icon: SquareKanban,
         requiredPermissions: [PERMISSIONS.SCHEDULE_VIEW],
-      },
-      {
-        title: "Library",
-        href: "/library",
-        icon: FolderOpen,
-        requiredPermissions: [PERMISSIONS.DOCUMENTS_VIEW],
       },
       {
         title: "Notes",
