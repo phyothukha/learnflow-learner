@@ -41,6 +41,12 @@ export const PERMISSIONS = {
   NOTES_UPDATE: "notes_update",
   NOTES_DELETE: "notes_delete",
 
+  // Teams
+  TEAMS_VIEW: "teams_view",
+  TEAMS_CREATE: "teams_create",
+  TEAMS_UPDATE: "teams_update",
+  TEAMS_DELETE: "teams_delete",
+
   // Schedule (study blocks)
   SCHEDULE_VIEW: "schedule_view",
   SCHEDULE_CREATE: "schedule_create",

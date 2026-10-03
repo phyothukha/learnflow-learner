@@ -6,6 +6,7 @@ import { useSession } from "next-auth/react";
 import { Plus } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
+import { Skeleton } from "@/components/ui/skeleton";
 import { usePermission } from "@/hooks/use-permission";
 import { PERMISSIONS } from "@/lib/permissions";
 import { TaskView } from "@/lib/task-meta";
@@ -32,6 +33,11 @@ export default function TasksPage() {
     if (sessionStatus === "authenticated" && !canView)
       router.replace("/forbidden");
   }, [sessionStatus, canView, router]);
+
+  // Avoid a blank flash that looks like navigation failed.
+  if (sessionStatus === "loading") {
+    return <Skeleton className="h-full min-h-64 w-full rounded-xl" />;
+  }
 
   if (sessionStatus !== "authenticated" || !canView) return null;
 

@@ -2,6 +2,7 @@ import {
   LayoutDashboard,
   NotebookPen,
   SquareKanban,
+  UsersRound,
   type LucideIcon,
 } from "lucide-react";
 import { PERMISSIONS, type PermissionCode } from "@/lib/permissions";
@@ -32,6 +33,13 @@ export const navLinks: NavLinkGroup[] = [
         href: "/tasks",
         icon: SquareKanban,
         requiredPermissions: [PERMISSIONS.SCHEDULE_VIEW],
+      },
+      {
+        title: "Teams",
+        href: "/teams",
+        icon: UsersRound,
+        // JWT may not include TEAMS_* yet — NOTES_VIEW is enough to browse assigned teams.
+        requiredPermissions: [PERMISSIONS.NOTES_VIEW],
       },
       {
         title: "Notes",

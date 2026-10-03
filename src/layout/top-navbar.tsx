@@ -1,6 +1,6 @@
 "use client";
 
-import { useLayoutEffect, useRef, useState } from "react";
+import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -9,7 +9,6 @@ import { LogOut, Menu, Volume2, VolumeX } from "lucide-react";
 import { ConfirmDialog } from "@/components/confirm-dialog";
 import { PrimaryColorPicker } from "@/components/primary-color-picker";
 import { ThemeToggle } from "@/components/theme-toggle";
-import { TopicContextSwitcher } from "@/components/topic-context-switcher";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Button } from "@/components/ui/button";
 import {
@@ -32,6 +31,13 @@ import { useConfirmLogout } from "@/hooks/use-confirm-logout";
 import { usePermission } from "@/hooks/use-permission";
 import { cn } from "@/lib/utils";
 import { useWorkspaceStore } from "@/store/client/use-store";
+
+/** Longest matching nav href for the current path (avoids prefix false-positives). */
+function matchNavHref(pathname: string, hrefs: string[]) {
+  return hrefs
+    .filter((href) => pathname === href || pathname.startsWith(`${href}/`))
+    .sort((a, b) => b.length - a.length)[0];
+}
 
 function getInitials(name: string) {
   return name
@@ -88,11 +94,19 @@ export function TopNavbar() {
     .flatMap((group) => group.items)
     .filter((item) => hasAnyPermission(item.requiredPermissions));
   const name = session?.user?.name ?? "?";
-  const showTopicSwitcher = pathname.startsWith("/notes");
 
-  const routeHref = items.find((item) => pathname.startsWith(item.href))?.href;
+  const routeHref = matchNavHref(
+    pathname,
+    items.map((item) => item.href),
+  );
   const activeHref =
     pending && pending.from === pathname ? pending.href : routeHref;
+
+  // Clear optimistic nav when the real route changes (or when navigating via
+  // in-page links like Dashboard "Open tasks" that never set pending).
+  useEffect(() => {
+    setPending(null);
+  }, [pathname]);
 
   useLayoutEffect(() => {
     const nav = navRef.current;
@@ -176,11 +190,6 @@ export function TopNavbar() {
         </div>
 
         <div className="flex shrink-0 items-center gap-1">
-          {showTopicSwitcher && (
-            <div className="mr-1 hidden w-52 sm:block">
-              <TopicContextSwitcher />
-            </div>
-          )}
           <PrimaryColorPicker />
           <ThemeToggle />
           <Button
