@@ -12,6 +12,19 @@ export const TEAM_COLORS = [
   "#64748b",
 ] as const;
 
+export const TEAM_LOGO_PRESETS = [
+  "📚",
+  "🧠",
+  "💻",
+  "🎯",
+  "📝",
+  "🧪",
+  "🗣️",
+  "🏆",
+  "🍜",
+  "🚀",
+] as const;
+
 export const TEAM_MEMBER_ROLES = new Map<TeamMemberRole, string>([
   [TeamMemberRole.Owner, "Owner"],
   [TeamMemberRole.Member, "Member"],

@@ -73,6 +73,7 @@ export function createTeamsSeed(): TeamsData {
         Id: "team-jlpt",
         Name: "JLPT Study Circle",
         Description: "Shared prep for N2 / N3 — grammar, kanji and mocks.",
+        Logo: "📚",
         Color: TEAM_COLORS[0],
         Members: [
           me,

@@ -1,29 +1,35 @@
 "use client";
 
-import { useEffect } from "react";
-import Link from "next/link";
+import { useEffect, useMemo } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
-import { ArrowUpRight, Lock, NotebookPen, UsersRound } from "lucide-react";
+import { UsersRound } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { Badge } from "@/components/ui/badge";
 import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { PERMISSIONS } from "@/lib/permissions";
-import { cn } from "@/lib/utils";
-import {
-  canAccessTeamNotes,
-  isTeamMember,
-  useTeamsStore,
-} from "@/store/client/teams-store";
+import { useNotesStore } from "@/store/client/notes-store";
+import { isTeamMember, useTeamsStore } from "@/store/client/teams-store";
+import { NoteVisibility } from "@/store/server/notes/interface";
+import { TeamCard } from "./components/team-card";
 
 export default function TeamsPage() {
   const router = useRouter();
   const { status } = useSession();
   const { hasPermission } = usePermission();
-  const canView = hasPermission(PERMISSIONS.NOTES_VIEW);
+  const canView = hasPermission(PERMISSIONS.TEAMS_VIEW);
   const ready = useWorkspaceNotesHydration();
   const teams = useTeamsStore((state) => state.teams);
+  const notes = useNotesStore((state) => state.notes);
+
+  const notesByTeam = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const note of notes) {
+      if (note.Visibility !== NoteVisibility.Team || !note.TeamId) continue;
+      map.set(note.TeamId, (map.get(note.TeamId) ?? 0) + 1);
+    }
+    return map;
+  }, [notes]);
 
   useEffect(() => {
     if (status === "authenticated" && !canView) router.replace("/forbidden");
@@ -52,58 +58,13 @@ export default function TeamsPage() {
         </div>
       ) : (
         <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
-          {mine.map((team) => {
-            const notesAccess = canAccessTeamNotes(team);
-            return (
-              <Link
-                key={team.Id}
-                href={`/teams/${team.Id}`}
-                className={cn(
-                  "group relative overflow-hidden rounded-2xl border bg-card p-5 shadow-xs transition-all",
-                  "hover:border-primary/30 hover:shadow-md",
-                )}
-              >
-                <div
-                  className="absolute inset-x-0 top-0 h-1"
-                  style={{ backgroundColor: team.Color }}
-                />
-                <div className="flex items-start gap-3">
-                  <span
-                    className="flex size-11 shrink-0 items-center justify-center rounded-xl text-sm font-semibold text-white shadow-sm"
-                    style={{ backgroundColor: team.Color }}
-                  >
-                    {team.Name.slice(0, 1).toUpperCase()}
-                  </span>
-                  <div className="min-w-0 flex-1">
-                    <div className="flex items-start justify-between gap-2">
-                      <p className="truncate font-semibold tracking-tight">
-                        {team.Name}
-                      </p>
-                      <ArrowUpRight className="size-4 shrink-0 text-muted-foreground opacity-0 transition-opacity group-hover:opacity-100" />
-                    </div>
-                    {team.Description && (
-                      <p className="mt-1 line-clamp-2 text-xs leading-relaxed text-muted-foreground">
-                        {team.Description}
-                      </p>
-                    )}
-                  </div>
-                </div>
-                <div className="mt-4">
-                  {notesAccess ? (
-                    <Badge variant="status-green" className="gap-1 font-normal">
-                      <NotebookPen className="size-3" />
-                      Notes available
-                    </Badge>
-                  ) : (
-                    <Badge variant="outline" className="gap-1 font-normal">
-                      <Lock className="size-3" />
-                      No notes access
-                    </Badge>
-                  )}
-                </div>
-              </Link>
-            );
-          })}
+          {mine.map((team) => (
+            <TeamCard
+              key={team.Id}
+              team={team}
+              notesCount={notesByTeam.get(team.Id) ?? 0}
+            />
+          ))}
         </div>
       )}
     </div>
