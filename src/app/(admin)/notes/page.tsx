@@ -4,13 +4,13 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useSession } from "next-auth/react";
 import { Lock, NotebookPen } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { PERMISSIONS } from "@/lib/permissions";
 import { privateNotes, useNotesStore } from "@/store/client/notes-store";
 import { CURRENT_USER_ID } from "@/store/client/teams-store";
 import { NoteVisibility } from "@/store/server/notes/interface";
+import { Button } from "@/components/ui/button";
 
 export default function NotesPage() {
   const router = useRouter();
@@ -52,8 +52,9 @@ export default function NotesPage() {
         Private notes stay here. For team notes, open a team under Teams.
       </p>
       {canCreate && (
-        <Button size="sm" className="mt-2" onClick={create}>
-          <Lock /> Private note
+        <Button className="mt-2" onClick={create}>
+          <Lock />
+          Private note
         </Button>
       )}
     </div>

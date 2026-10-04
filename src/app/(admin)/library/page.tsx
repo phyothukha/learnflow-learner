@@ -300,7 +300,7 @@ function CreateTopicDialog() {
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button>
-          <Plus className="size-4" />
+          <Plus />
           New topic
         </Button>
       </DialogTrigger>

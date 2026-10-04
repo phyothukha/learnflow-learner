@@ -64,8 +64,9 @@ export function NotesWorkspaceShell({
         <div className="flex flex-wrap items-center gap-2">
           {headerActions}
           {canCreate ? (
-            <Button size="sm" onClick={onCreate} disabled={!ready}>
-              <SquarePen /> New note
+            <Button onClick={onCreate} disabled={!ready}>
+              <SquarePen />
+              New note
             </Button>
           ) : null}
         </div>

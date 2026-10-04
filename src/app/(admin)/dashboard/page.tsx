@@ -77,7 +77,7 @@ export default function DashboardPage() {
                 Tasks
               </Link>
             </Button>
-            <Button size="sm" asChild>
+            <Button asChild>
               <Link href="/notes" prefetch>
                 <NotebookPen />
                 Notes

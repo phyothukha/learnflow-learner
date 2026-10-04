@@ -109,6 +109,7 @@ export function createTeamsSeed(): TeamsData {
         Id: "team-fe",
         Name: "ITPEC FE Crew",
         Description: "Fundamentals exam practice and past papers.",
+        Logo: "💻",
         Color: TEAM_COLORS[1],
         Members: [
           {
@@ -139,6 +140,7 @@ export function createTeamsSeed(): TeamsData {
         Id: "team-react",
         Name: "React Builders",
         Description: "Portfolio projects and weekly code review.",
+        Logo: "⚛️",
         Color: TEAM_COLORS[4],
         Members: [
           member(

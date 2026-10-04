@@ -257,7 +257,7 @@ export function WorkspaceNoteDetail({
                     ) : (
                       <Copy className="size-4" />
                     )}
-                    Copy content
+                    Copy note
                   </DropdownMenuItem>
                 )}
                 {canDelete && isOwner && (

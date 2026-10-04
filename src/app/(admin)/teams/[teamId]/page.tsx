@@ -2,7 +2,6 @@
 
 import { use } from "react";
 import { NotebookPen } from "lucide-react";
-import { Button } from "@/components/ui/button";
 import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { PERMISSIONS } from "@/lib/permissions";
@@ -14,6 +13,7 @@ import {
 } from "@/store/client/teams-store";
 import { NoteVisibility } from "@/store/server/notes/interface";
 import { useRouter } from "next/navigation";
+import { Button } from "@/components/ui/button";
 
 interface TeamPageProps {
   params: Promise<{ teamId: string }>;
@@ -61,7 +61,7 @@ export default function TeamPage({ params }: TeamPageProps) {
         Notes tab.
       </p>
       {canCreate && (
-        <Button size="sm" className="mt-2" onClick={create}>
+        <Button className="mt-2" onClick={create}>
           New note
         </Button>
       )}
