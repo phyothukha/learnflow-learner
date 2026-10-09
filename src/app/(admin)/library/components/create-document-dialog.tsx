@@ -213,7 +213,7 @@ export function CreateDocumentDialog({
           New document
         </Button>
       </DialogTrigger>
-      <DialogContent className="sm:max-w-lg">
+      <DialogContent className="sm:max-w-2xl">
         <DialogHeader>
           <DialogTitle>New document</DialogTitle>
           <DialogDescription>
