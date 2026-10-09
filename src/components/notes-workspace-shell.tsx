@@ -2,10 +2,10 @@
 
 import Link from "next/link";
 import dayjs from "dayjs";
-import { Search, SquarePen, type LucideIcon } from "lucide-react";
+import { SquarePen, type LucideIcon } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
+import { SearchInput } from "@/components/search-input";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 import type { WorkspaceNote } from "@/store/server/notes/interface";
@@ -95,15 +95,12 @@ export function NotesWorkspaceShell({
           )}
         >
           <div className="flex shrink-0 items-center gap-2 border-b px-3 py-2.5">
-            <div className="relative min-w-0 flex-1">
-              <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-              <Input
-                value={search}
-                onChange={(e) => onSearchChange(e.target.value)}
-                placeholder={searchPlaceholder}
-                className="h-9 bg-muted/40 pl-8"
-              />
-            </div>
+            <SearchInput
+              value={search}
+              onChange={onSearchChange}
+              placeholder={searchPlaceholder}
+              className="flex-1 sm:w-auto"
+            />
             {canCreate && (
               <Button
                 variant="ghost"

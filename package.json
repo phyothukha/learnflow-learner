@@ -1,5 +1,5 @@
 {
-  "name": "learnflow_web",
+  "name": "learnflow-learner",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -20,7 +20,6 @@
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
-    "date-fns": "^4.4.0",
     "dayjs": "^1.11.21",
     "js-cookie": "^3.0.8",
     "lucide-react": "^1.24.0",

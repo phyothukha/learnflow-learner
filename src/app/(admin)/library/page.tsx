@@ -1,12 +1,10 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import relativeTime from "dayjs/plugin/relativeTime";
-import { Library, Plus, Search, Trash2 } from "lucide-react";
+import { Library, Plus, Trash2 } from "lucide-react";
 
 dayjs.extend(relativeTime);
 import { toast } from "sonner";
@@ -21,11 +19,12 @@ import {
   DialogTrigger,
 } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
+import { SearchInput } from "@/components/search-input";
 import { Label } from "@/components/ui/label";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Textarea } from "@/components/ui/textarea";
-import { usePermission } from "@/hooks/use-permission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useRequirePermission } from "@/hooks/use-require-permission";
 import { cn } from "@/lib/utils";
 import {
   DEFAULT_TOPIC_COLOR,
@@ -65,10 +64,7 @@ function sortTopics(topics: Topic[], mode: SortMode) {
 }
 
 export default function LibraryPage() {
-  const router = useRouter();
-  const { status } = useSession();
-  const { hasPermission } = usePermission();
-  const canView = hasPermission(PERMISSIONS.DOCUMENTS_VIEW);
+  const canView = useRequirePermission(PERMISSIONS.DOCUMENTS_VIEW);
 
   const { activeTopicId, setActiveTopic } = useWorkspaceStore();
   const [search, setSearch] = useState("");
@@ -87,11 +83,7 @@ export default function LibraryPage() {
     return counts;
   }, [documentsData?.Items]);
 
-  useEffect(() => {
-    if (status === "authenticated" && !canView) router.replace("/forbidden");
-  }, [status, canView, router]);
-
-  if (status !== "authenticated" || !canView) return null;
+  if (!canView) return null;
 
   const topics = topicsData?.Items ?? [];
   const query = search.trim().toLowerCase();
@@ -135,15 +127,11 @@ export default function LibraryPage() {
         />
 
         <div className="library-card space-y-3 p-3">
-          <div className="relative">
-            <Search className="absolute top-1/2 left-3 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search topics by name or description…"
-              className="h-10 bg-background pl-9"
-            />
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search topics by name or description…"
+          />
           <AnimatedTabs
             value={sort}
             onValueChange={setSort}

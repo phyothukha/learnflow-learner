@@ -1,8 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { LayoutGrid, List, Search, X } from "lucide-react";
-import { Input } from "@/components/ui/input";
+import { LayoutGrid, List } from "lucide-react";
+import { SearchInput } from "@/components/search-input";
 import { Skeleton } from "@/components/ui/skeleton";
 import { AnimatedTabs, AnimatedTabsVariant } from "@/components/animated-tabs";
 import { DocumentKindIcon } from "@/components/document-kind-icon";
@@ -104,24 +104,12 @@ export function TopicFilesView({
       <div className="min-w-0 space-y-4">
         <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border bg-muted/30 px-3 py-2">
           <FolderBreadcrumb path={path} onNavigate={navigate} />
-          <div className="relative">
-            <Search className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search files…"
-              className="h-8 w-64 bg-background pr-8 pl-8"
-            />
-            {isSearching && (
-              <button
-                type="button"
-                onClick={() => setSearch("")}
-                className="absolute top-1/2 right-2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
-              >
-                <X className="size-3.5" />
-              </button>
-            )}
-          </div>
+          <SearchInput
+            value={search}
+            onChange={setSearch}
+            placeholder="Search files…"
+            className="sm:w-64"
+          />
         </div>
 
         <section className="library-card overflow-hidden">

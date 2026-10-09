@@ -1,11 +1,20 @@
 "use client";
 
-import { useState, type PropsWithChildren } from "react";
+import { useEffect, useState, type PropsWithChildren } from "react";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { SessionProvider } from "next-auth/react";
 import { ThemeProvider } from "@/components/theme-provider";
+import useStore from "@/store/client/use-store";
 
 export default function Providers({ children }: PropsWithChildren) {
+  // Cookie-backed client state is read after mount so the first client render
+  // matches the server HTML (avoids hydration attribute mismatches).
+  useEffect(() => {
+    const { hydrateWorkspace, hydratePrimaryColor } = useStore.getState();
+    hydrateWorkspace();
+    hydratePrimaryColor();
+  }, []);
+
   const [queryClient] = useState(
     () =>
       new QueryClient({

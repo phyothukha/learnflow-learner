@@ -1,9 +1,8 @@
 "use client";
 
-import { use, useEffect, useState } from "react";
+import { use, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { ArrowLeft, Lock, UsersRound } from "lucide-react";
 import { NotesWorkspaceShell } from "@/components/notes-workspace-shell";
 import { Button } from "@/components/ui/button";
@@ -11,6 +10,7 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useRequirePermission } from "@/hooks/use-require-permission";
 import { useNotesStore } from "@/store/client/notes-store";
 import {
   CURRENT_USER_ID,
@@ -33,9 +33,8 @@ export default function TeamNotesLayout({
   const { teamId } = use(params);
   const pathname = usePathname();
   const router = useRouter();
-  const { status } = useSession();
   const { hasPermission } = usePermission();
-  const canView = hasPermission(PERMISSIONS.NOTES_VIEW);
+  const canView = useRequirePermission(PERMISSIONS.NOTES_VIEW);
   const canCreate = hasPermission(PERMISSIONS.NOTES_CREATE);
   const ready = useWorkspaceNotesHydration();
   const [search, setSearch] = useState("");
@@ -45,11 +44,7 @@ export default function TeamNotesLayout({
   const notes = useNotesStore((state) => state.notes);
   const createNote = useNotesStore((state) => state.createNote);
 
-  useEffect(() => {
-    if (status === "authenticated" && !canView) router.replace("/forbidden");
-  }, [status, canView, router]);
-
-  if (status !== "authenticated" || !canView || !ready) {
+  if (!canView || !ready) {
     return <Skeleton className="h-full min-h-64 rounded-xl" />;
   }
 

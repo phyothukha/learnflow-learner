@@ -3,7 +3,6 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import dayjs from "dayjs";
 import {
   ArrowLeft,
@@ -39,6 +38,7 @@ import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { NOTE_VISIBILITY } from "@/lib/team-meta";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useRequirePermission } from "@/hooks/use-require-permission";
 import { cn } from "@/lib/utils";
 import { accessibleNotes, useNotesStore } from "@/store/client/notes-store";
 import {
@@ -72,9 +72,8 @@ export function WorkspaceNoteDetail({
   expectedVisibility,
 }: WorkspaceNoteDetailProps) {
   const router = useRouter();
-  const { status } = useSession();
   const { hasPermission } = usePermission();
-  const canView = hasPermission(PERMISSIONS.NOTES_VIEW);
+  const canView = useRequirePermission(PERMISSIONS.NOTES_VIEW);
   const canUpdate = hasPermission(PERMISSIONS.NOTES_UPDATE);
   const canDelete = hasPermission(PERMISSIONS.NOTES_DELETE);
   const ready = useWorkspaceNotesHydration();
@@ -113,10 +112,6 @@ export function WorkspaceNoteDetail({
   dirtyRef.current = isDirty;
 
   useEffect(() => {
-    if (status === "authenticated" && !canView) router.replace("/forbidden");
-  }, [status, canView, router]);
-
-  useEffect(() => {
     if (!note) return;
     setTitle(note.Title);
     setContent(note.Content ?? "");
@@ -135,7 +130,7 @@ export function WorkspaceNoteDetail({
     return !dirtyRef.current || (await confirmDiscardChanges());
   }, [confirmDiscardChanges]);
 
-  if (status !== "authenticated" || !canView || !ready) return null;
+  if (!canView || !ready) return null;
 
   if (!hydrated && note) {
     return <Skeleton className="h-full min-h-0 rounded-xl" />;

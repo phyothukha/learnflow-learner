@@ -2,10 +2,9 @@
 
 import { use, useEffect, useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { AnimatedTabs } from "@/components/animated-tabs";
-import { usePermission } from "@/hooks/use-permission";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useRequirePermission } from "@/hooks/use-require-permission";
 import { useWorkspaceStore } from "@/store/client/use-store";
 import { useFetchDocuments } from "@/store/server/documents/queries";
 import { useFetchFolderTree } from "@/store/server/topic-folders/queries";
@@ -53,9 +52,7 @@ export default function TopicDocumentsPage({
   const { topicId } = use(params);
   const { folder: folderParam, tab: tabParam } = use(searchParams);
   const router = useRouter();
-  const { status } = useSession();
-  const { hasPermission } = usePermission();
-  const canView = hasPermission(PERMISSIONS.DOCUMENTS_VIEW);
+  const canView = useRequirePermission(PERMISSIONS.DOCUMENTS_VIEW);
   const { setActiveTopic } = useWorkspaceStore();
 
   const activeTab: TopicTab =
@@ -72,10 +69,6 @@ export default function TopicDocumentsPage({
     useFetchFolderTree(topicId);
   const { data: documentsData, isLoading: documentsLoading } =
     useFetchDocuments({ limit: 500, topicId });
-
-  useEffect(() => {
-    if (status === "authenticated" && !canView) router.replace("/forbidden");
-  }, [status, canView, router]);
 
   useEffect(() => {
     setActiveTopic(topicId);
@@ -99,7 +92,7 @@ export default function TopicDocumentsPage({
     [allDocuments, tree],
   );
 
-  if (status !== "authenticated" || !canView) return null;
+  if (!canView) return null;
 
   const topic = topicsData?.Items.find((t) => t.Id === topicId);
   if (!topicsLoading && !topic) return <TopicNotFound />;

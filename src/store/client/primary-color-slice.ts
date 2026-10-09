@@ -26,10 +26,16 @@ export function applyPrimaryColor(id: PrimaryColorId) {
 export interface PrimaryColorSlice {
   primaryColor: PrimaryColorId;
   setPrimaryColor: (id: PrimaryColorId) => void;
+  /** Loads the cookie state on the client after mount (keeps SSR markup in sync). */
+  hydratePrimaryColor: () => void;
 }
 
 const createPrimaryColorSlice: StateCreator<PrimaryColorSlice> = (set) => ({
-  primaryColor: resolvePrimaryColorId(Cookies.get(PRIMARY_COLOR_COOKIE)),
+  primaryColor: DEFAULT_PRIMARY_COLOR,
+  hydratePrimaryColor: () =>
+    set({
+      primaryColor: resolvePrimaryColorId(Cookies.get(PRIMARY_COLOR_COOKIE)),
+    }),
   setPrimaryColor: (id) => {
     const resolvedId = resolvePrimaryColorId(id);
     Cookies.set(PRIMARY_COLOR_COOKIE, resolvedId, {

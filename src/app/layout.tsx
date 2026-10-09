@@ -68,6 +68,7 @@ export default async function RootLayout({
     >
       <body
         className={`${fontSans.variable} ${fontMono.variable} ${fontPoppins.variable} ${fontBrand.variable} antialiased`}
+        suppressHydrationWarning
       >
         <Suspense fallback={null}>
           <NavigationProgress />

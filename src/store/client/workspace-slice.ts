@@ -15,6 +15,8 @@ export interface WorkspaceSlice {
   toggleSoundMuted: () => void;
   toggleWidget: (widget: string) => void;
   showAllWidgets: () => void;
+  /** Loads the cookie state on the client after mount (keeps SSR markup in sync). */
+  hydrateWorkspace: () => void;
 }
 
 type WorkspaceCookie = Pick<
@@ -22,12 +24,13 @@ type WorkspaceCookie = Pick<
   "activeTopicId" | "soundMuted" | "hiddenWidgets"
 >;
 
+const fallback: WorkspaceCookie = {
+  activeTopicId: null,
+  soundMuted: false,
+  hiddenWidgets: [],
+};
+
 function readWorkspaceCookie(): WorkspaceCookie {
-  const fallback: WorkspaceCookie = {
-    activeTopicId: null,
-    soundMuted: false,
-    hiddenWidgets: [],
-  };
   const cookieState = Cookies.get(WORKSPACE_COOKIE);
   if (!cookieState) return fallback;
   try {
@@ -62,7 +65,7 @@ const createWorkspaceSlice: StateCreator<WorkspaceSlice> = (set, get) => {
   };
 
   return {
-    ...readWorkspaceCookie(),
+    ...fallback,
     setActiveTopic: (id) => save({ activeTopicId: id }),
     toggleSoundMuted: () => save({ soundMuted: !get().soundMuted }),
     toggleWidget: (widget) => {
@@ -71,6 +74,7 @@ const createWorkspaceSlice: StateCreator<WorkspaceSlice> = (set, get) => {
       save({ hiddenWidgets: [...hidden] });
     },
     showAllWidgets: () => save({ hiddenWidgets: [] }),
+    hydrateWorkspace: () => set(readWorkspaceCookie()),
   };
 };
 

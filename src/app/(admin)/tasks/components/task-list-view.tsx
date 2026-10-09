@@ -214,7 +214,6 @@ export function TaskListView({ tasks }: TaskListViewProps) {
       data={rows}
       getRowId={(task) => task.Id}
       showToolbar={false}
-      showCheckbox={false}
       page={currentPage}
       total={sorted.length}
       limit={limit}

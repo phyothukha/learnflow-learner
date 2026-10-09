@@ -1,37 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useSession } from "next-auth/react";
 import { ArrowLeft, Lock } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { MarkdownSplitEditor } from "@/components/markdown-split-editor";
-import { usePermission } from "@/hooks/use-permission";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { PERMISSIONS } from "@/lib/permissions";
+import { useRequirePermission } from "@/hooks/use-require-permission";
 import { useNotesStore } from "@/store/client/notes-store";
 import { CURRENT_USER_ID } from "@/store/client/teams-store";
 import { NoteVisibility } from "@/store/server/notes/interface";
 
 export default function NewNotePage() {
   const router = useRouter();
-  const { status } = useSession();
-  const { hasPermission } = usePermission();
-  const canCreate = hasPermission(PERMISSIONS.NOTES_CREATE);
+  const canCreate = useRequirePermission(PERMISSIONS.NOTES_CREATE);
   const ready = useWorkspaceNotesHydration();
   const createNote = useNotesStore((state) => state.createNote);
   const [title, setTitle] = useState("");
   const [content, setContent] = useState("");
 
-  useEffect(() => {
-    if (status === "authenticated" && !canCreate) router.replace("/forbidden");
-  }, [status, canCreate, router]);
-
-  if (status !== "authenticated" || !canCreate || !ready) return null;
+  if (!canCreate || !ready) return null;
 
   const handleCreate = () => {
     if (!title.trim()) {
