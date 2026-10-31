@@ -18,7 +18,8 @@ import { privateNotes, useNotesStore } from "@/store/client/notes-store";
 import { isTeamMember, useTeamsStore } from "@/store/client/teams-store";
 import { TaskStatus } from "@/store/server/tasks/interface";
 import { createFakeTasks } from "@/app/(admin)/tasks/data/fake-tasks";
-import { createFakeGoals, createFakeMilestones } from "./data/fake-goals";
+import { useGoalsStore } from "@/store/client/goals-store";
+import { toDashboardGoals, toDashboardMilestones } from "./data/fake-goals";
 import { GoalProgressCard } from "./components/goal-progress-card";
 import { MissedTasksBanner } from "./components/missed-tasks-banner";
 import { UpcomingMilestones } from "./components/upcoming-milestones";
@@ -52,8 +53,12 @@ export default function DashboardPage() {
   );
 
   const mineNotes = useMemo(() => privateNotes(notes), [notes]);
-  const goals = useMemo(() => createFakeGoals(), []);
-  const milestones = useMemo(() => createFakeMilestones(), []);
+  const storeGoals = useGoalsStore((state) => state.goals);
+  const goals = useMemo(() => toDashboardGoals(storeGoals), [storeGoals]);
+  const milestones = useMemo(
+    () => toDashboardMilestones(storeGoals),
+    [storeGoals],
+  );
 
   const missedTasks = useMemo(
     () =>

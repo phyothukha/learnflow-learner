@@ -1,5 +1,4 @@
 import dayjs from "dayjs";
-import { createFakeGoals as createGoals } from "@/app/(admin)/goals/data/fake-goals";
 import {
   GoalPlan,
   MilestoneState,
@@ -26,8 +25,8 @@ export interface DashboardMilestone {
   EndAt: string;
 }
 
-export function createFakeGoals(): DashboardGoal[] {
-  return createGoals().map((goal) => {
+export function toDashboardGoals(goals: Goal[]): DashboardGoal[] {
+  return goals.map((goal) => {
     const { done, total } = goalProgress(goal);
     return {
       Id: goal.Id,
@@ -42,10 +41,10 @@ export function createFakeGoals(): DashboardGoal[] {
 }
 
 /** Current and next milestone of every goal, soonest first. */
-export function createFakeMilestones(): DashboardMilestone[] {
+export function toDashboardMilestones(goals: Goal[]): DashboardMilestone[] {
   const today = dayjs().startOf("day");
-  return createGoals()
-    .flatMap((goal: Goal) =>
+  return goals
+    .flatMap((goal) =>
       goal.Milestones.filter(
         (milestone) =>
           milestoneState(goal, milestone) !== MilestoneState.Achieved &&
