@@ -1,4 +1,5 @@
 import {
+  CalendarDays,
   LayoutDashboard,
   NotebookPen,
   SquareKanban,
@@ -27,6 +28,12 @@ export const navLinks: NavLinkGroup[] = [
         href: "/dashboard",
         icon: LayoutDashboard,
         requiredPermissions: [PERMISSIONS.DASHBOARD_VIEW],
+      },
+      {
+        title: "Calendar",
+        href: "/calendar",
+        icon: CalendarDays,
+        requiredPermissions: [PERMISSIONS.SCHEDULE_VIEW],
       },
       {
         title: "Tasks",

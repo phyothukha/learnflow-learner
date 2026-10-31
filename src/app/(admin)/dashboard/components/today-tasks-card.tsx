@@ -1,8 +1,9 @@
 "use client";
 
+import type { ReactNode } from "react";
 import Link from "next/link";
 import dayjs from "dayjs";
-import { CalendarClock } from "lucide-react";
+import { CalendarClock, Check } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -11,7 +12,13 @@ import { cn } from "@/lib/utils";
 import { TaskStatus, type Task } from "@/store/server/tasks/interface";
 import { WidgetHeader } from "./widget-header";
 
-export function TodayTasksCard({ tasks }: { tasks: Task[] }) {
+export function TodayTasksCard({
+  tasks,
+  footer,
+}: {
+  tasks: Task[];
+  footer?: ReactNode;
+}) {
   const sorted = [...tasks].sort(
     (a, b) => dayjs(a.StartAt).valueOf() - dayjs(b.StartAt).valueOf(),
   );
@@ -45,7 +52,6 @@ export function TodayTasksCard({ tasks }: { tasks: Task[] }) {
                   className={cn(
                     "flex items-center gap-3 rounded-lg border px-3 py-2.5",
                     active && "border-primary/50 bg-primary/5",
-                    task.Status === TaskStatus.Done && "opacity-60",
                   )}
                 >
                   <span
@@ -56,7 +62,15 @@ export function TodayTasksCard({ tasks }: { tasks: Task[] }) {
                     {dayjs(task.StartAt).format("HH:mm")}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-sm font-medium">{task.Title}</p>
+                    <p
+                      className={cn(
+                        "truncate text-sm font-medium",
+                        task.Status === TaskStatus.Done &&
+                          "text-muted-foreground line-through",
+                      )}
+                    >
+                      {task.Title}
+                    </p>
                     <p className="truncate text-xs text-muted-foreground">
                       {category?.label}
                       {task.Location ? ` · ${task.Location}` : ""}
@@ -67,11 +81,24 @@ export function TodayTasksCard({ tasks }: { tasks: Task[] }) {
                       {status.label}
                     </Badge>
                   )}
+                  <span
+                    aria-hidden
+                    className={cn(
+                      "flex size-6 shrink-0 items-center justify-center rounded-full border",
+                      task.Status === TaskStatus.Done &&
+                        "border-emerald-500 bg-emerald-500 text-white",
+                    )}
+                  >
+                    {task.Status === TaskStatus.Done && (
+                      <Check className="size-3.5" strokeWidth={3} />
+                    )}
+                  </span>
                 </li>
               );
             })}
           </ul>
         )}
+        {footer && <div className="mt-5">{footer}</div>}
       </CardContent>
     </Card>
   );

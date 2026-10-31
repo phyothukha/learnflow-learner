@@ -7,20 +7,21 @@ import dayjs from "dayjs";
 import {
   CalendarDays,
   CheckCircle2,
-  NotebookPen,
-  UsersRound,
+  Flame,
+  Plus,
+  TriangleAlert,
 } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { Button } from "@/components/ui/button";
 import { useWorkspaceNotesHydration } from "@/hooks/use-workspace-notes-hydration";
 import { privateNotes, useNotesStore } from "@/store/client/notes-store";
-import {
-  canAccessTeamNotes,
-  isTeamMember,
-  useTeamsStore,
-} from "@/store/client/teams-store";
+import { isTeamMember, useTeamsStore } from "@/store/client/teams-store";
 import { TaskStatus } from "@/store/server/tasks/interface";
 import { createFakeTasks } from "@/app/(admin)/tasks/data/fake-tasks";
+import { createFakeGoals, createFakeMilestones } from "./data/fake-goals";
+import { GoalProgressCard } from "./components/goal-progress-card";
+import { MissedTasksBanner } from "./components/missed-tasks-banner";
+import { UpcomingMilestones } from "./components/upcoming-milestones";
 import { RecentNotesCard } from "./components/recent-notes-card";
 import { TeamsOverviewCard } from "./components/teams-overview-card";
 import { TodayTasksCard } from "./components/today-tasks-card";
@@ -51,19 +52,51 @@ export default function DashboardPage() {
   );
 
   const mineNotes = useMemo(() => privateNotes(notes), [notes]);
+  const goals = useMemo(() => createFakeGoals(), []);
+  const milestones = useMemo(() => createFakeMilestones(), []);
+
+  const missedTasks = useMemo(
+    () =>
+      tasks
+        .filter(
+          (task) =>
+            task.Status !== TaskStatus.Done &&
+            dayjs(task.EndAt).isBefore(today) &&
+            dayjs(task.EndAt).isAfter(today.subtract(7, "day")),
+        )
+        .sort(
+          (a, b) => dayjs(b.StartAt).valueOf() - dayjs(a.StartAt).valueOf(),
+        ),
+    [tasks, today],
+  );
+
+  const streak = useMemo(() => {
+    const doneDays = new Set(
+      tasks
+        .filter((task) => task.Status === TaskStatus.Done)
+        .map((task) => dayjs(task.StartAt).format("YYYY-MM-DD")),
+    );
+    let count = 0;
+    let day = today;
+    if (!doneDays.has(day.format("YYYY-MM-DD"))) day = day.subtract(1, "day");
+    while (doneDays.has(day.format("YYYY-MM-DD"))) {
+      count += 1;
+      day = day.subtract(1, "day");
+    }
+    return count;
+  }, [tasks, today]);
 
   const doneToday = todayTasks.filter(
     (task) => task.Status === TaskStatus.Done,
   ).length;
   const openToday = todayTasks.length - doneToday;
-  const notesAccessTeams = myTeams.filter((team) => canAccessTeamNotes(team));
 
   const firstName = session?.user?.name?.trim().split(/\s+/)[0] || "there";
 
   if (!ready) return null;
 
   return (
-    <div className="flex h-full min-h-0 flex-col gap-6 pb-6">
+    <div className="flex flex-col gap-4 pb-6">
       <PageHeader
         title={`${greetingForHour(dayjs().hour())}, ${firstName}`}
         description={dayjs().format(
@@ -71,33 +104,35 @@ export default function DashboardPage() {
         )}
         actions={
           <div className="flex flex-wrap gap-2">
-            <Button variant="outline" size="sm" asChild>
-              <Link href="/tasks" prefetch>
+            <Button variant="secondary" asChild>
+              <Link href="/calendar" prefetch>
                 <CalendarDays />
-                Tasks
+                Calendar
               </Link>
             </Button>
             <Button asChild>
-              <Link href="/notes" prefetch>
-                <NotebookPen />
-                Notes
+              <Link href="/goals" prefetch>
+                <Plus />
+                New goal
               </Link>
             </Button>
           </div>
         }
       />
 
-      <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-4">
+      <MissedTasksBanner tasks={missedTasks} />
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
         <StatTile
           icon={CalendarDays}
           label="Today’s tasks"
-          value={todayTasks.length}
+          value={String(todayTasks.length)}
           hint={openToday === 0 ? "All clear" : `${openToday} still open`}
         />
         <StatTile
           icon={CheckCircle2}
           label="Done today"
-          value={doneToday}
+          value={String(doneToday)}
           hint={
             todayTasks.length
               ? `${Math.round((doneToday / todayTasks.length) * 100)}% complete`
@@ -105,26 +140,28 @@ export default function DashboardPage() {
           }
         />
         <StatTile
-          icon={UsersRound}
-          label="Your teams"
-          value={myTeams.length}
-          hint={
-            notesAccessTeams.length
-              ? `${notesAccessTeams.length} with notes access`
-              : "No notes access yet"
-          }
+          icon={Flame}
+          label="Streak"
+          value={`${streak} ${streak === 1 ? "day" : "days"}`}
+          hint="Finish half of today’s tasks to keep it"
         />
         <StatTile
-          icon={NotebookPen}
-          label="Private notes"
-          value={mineNotes.length}
-          hint="In your Notes tab"
+          icon={TriangleAlert}
+          label="Needs attention"
+          value={String(missedTasks.length)}
+          hint="Missed tasks waiting for a decision"
         />
       </div>
 
-      <div className="grid min-h-0 flex-1 gap-4 xl:grid-cols-[minmax(0,1.4fr)_minmax(0,1fr)]">
-        <TodayTasksCard tasks={todayTasks} />
-        <div className="grid gap-4">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+        <div className="min-w-0 [&>*]:h-full">
+          <TodayTasksCard
+            tasks={todayTasks}
+            footer={<UpcomingMilestones milestones={milestones} />}
+          />
+        </div>
+        <div className="grid min-w-0 auto-rows-fr gap-4">
+          <GoalProgressCard goals={goals} />
           <TeamsOverviewCard teams={myTeams} />
           <RecentNotesCard notes={mineNotes} />
         </div>
@@ -141,7 +178,7 @@ function StatTile({
 }: {
   icon: typeof CalendarDays;
   label: string;
-  value: number;
+  value: string;
   hint: string;
 }) {
   return (

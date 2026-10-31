@@ -1,6 +1,6 @@
 "use client";
 
-import { CalendarDays, List, SquareKanban } from "lucide-react";
+import { List, SquareKanban } from "lucide-react";
 import {
   AnimatedTabs,
   AnimatedTabsVariant,
@@ -35,16 +35,6 @@ const VIEW_TABS: AnimatedTab<TaskView>[] = [
       <>
         <List className="size-4" />
         <span className="hidden sm:inline">List</span>
-      </>
-    ),
-  },
-  {
-    value: TaskView.Timeline,
-    title: "Timeline",
-    label: (
-      <>
-        <CalendarDays className="size-4" />
-        <span className="hidden sm:inline">Timeline</span>
       </>
     ),
   },

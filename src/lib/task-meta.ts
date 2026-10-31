@@ -8,7 +8,6 @@ import {
 export enum TaskView {
   Kanban = "kanban",
   List = "list",
-  Timeline = "timeline",
 }
 
 export interface TaskStatusMeta {
