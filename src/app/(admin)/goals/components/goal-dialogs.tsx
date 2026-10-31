@@ -1,6 +1,7 @@
 "use client";
 
-import { useState, type FormEvent, type ReactNode } from "react";
+import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import dayjs from "dayjs";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -24,6 +25,7 @@ import {
   GoalPlan,
   GoalResourceKind,
   type Goal,
+  type GoalMilestone,
   type GoalResource,
 } from "../interface";
 
@@ -360,6 +362,93 @@ export function AddResourceDialog({
           onChange={(event) => setDescription(event.target.value)}
         />
       </Field>
+    </FormDialog>
+  );
+}
+
+export interface MilestoneInput {
+  Title: string;
+  StartAt: string;
+  EndAt: string;
+}
+
+const toDateInput = (value: string) => value.slice(0, 10);
+
+/** Adds a milestone, or edits `milestone` when one is given. */
+export function MilestoneDialog({
+  goal,
+  milestone,
+  open,
+  onOpenChange,
+  onSubmit,
+}: {
+  goal: Goal;
+  milestone: GoalMilestone | null;
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  onSubmit: (input: MilestoneInput) => void;
+}) {
+  const [title, setTitle] = useState("");
+  const [start, setStart] = useState("");
+  const [end, setEnd] = useState("");
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!open) return;
+    setTitle(milestone?.Title ?? "");
+    setStart(toDateInput(dayjs(milestone?.StartAt ?? goal.StartAt).format()));
+    setEnd(toDateInput(dayjs(milestone?.EndAt ?? goal.EndAt).format()));
+    setError(null);
+  }, [open, milestone, goal.StartAt, goal.EndAt]);
+
+  return (
+    <FormDialog
+      open={open}
+      onOpenChange={onOpenChange}
+      title={milestone ? "Edit milestone" : "Add milestone"}
+      description={`A step towards ${goal.Name}.`}
+      submitLabel={milestone ? "Save changes" : "Add milestone"}
+      onSubmit={() => {
+        if (!title.trim()) return setError("Name is required.");
+        if (!start || !end) return setError("Choose a start and end date.");
+        if (dayjs(end).isBefore(start)) {
+          return setError("The end date can’t be before the start date.");
+        }
+        onSubmit({
+          Title: title.trim(),
+          StartAt: dayjs(start).startOf("day").toISOString(),
+          EndAt: dayjs(end).startOf("day").toISOString(),
+        });
+        onOpenChange(false);
+      }}
+    >
+      <Field label="Name" htmlFor="milestone-title">
+        <Input
+          id="milestone-title"
+          value={title}
+          onChange={(event) => setTitle(event.target.value)}
+          autoFocus
+        />
+      </Field>
+      <div className="grid gap-4 sm:grid-cols-2">
+        <Field label="Starts" htmlFor="milestone-start">
+          <Input
+            id="milestone-start"
+            type="date"
+            value={start}
+            onChange={(event) => setStart(event.target.value)}
+          />
+        </Field>
+        <Field label="Ends" htmlFor="milestone-end">
+          <Input
+            id="milestone-end"
+            type="date"
+            value={end}
+            onChange={(event) => setEnd(event.target.value)}
+          />
+        </Field>
+      </div>
+      {error && <p className="text-sm text-destructive">{error}</p>}
     </FormDialog>
   );
 }

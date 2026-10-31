@@ -40,9 +40,11 @@ export function GoalCard({ goal }: { goal: Goal }) {
           <span>
             {done}/{total} tasks
           </span>
-          <span className="tabular-nums">{percent}%</span>
+          <span className="text-sm font-semibold text-foreground tabular-nums">
+            {percent}%
+          </span>
         </div>
-        <div className="h-1.5 overflow-hidden rounded-full bg-muted">
+        <div className="h-2.5 overflow-hidden rounded-full bg-muted">
           <div
             className="h-full rounded-full"
             style={{ width: `${percent}%`, backgroundColor: goal.Color }}

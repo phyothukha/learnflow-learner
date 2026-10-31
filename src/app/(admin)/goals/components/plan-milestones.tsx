@@ -1,9 +1,11 @@
 "use client";
 
 import dayjs from "dayjs";
+import { Pencil, Plus, Trash2 } from "lucide-react";
 import { Badge, type BadgeVariant } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { MilestoneState, type Goal } from "../interface";
+import { MilestoneState, type Goal, type GoalMilestone } from "../interface";
 import { milestoneState, milestoneTasks, todayOffsetPercent } from "../utils";
 import { GoalTaskStatus } from "../interface";
 
@@ -27,17 +29,35 @@ const STATE_META = new Map<
 
 const formatDay = (value: string) => dayjs(value).format("MMM D");
 
-export function PlanMilestones({ goal }: { goal: Goal }) {
+export interface PlanMilestonesProps {
+  goal: Goal;
+  onAdd: () => void;
+  onEdit: (milestone: GoalMilestone) => void;
+  onDelete: (milestone: GoalMilestone) => void;
+}
+
+export function PlanMilestones({
+  goal,
+  onAdd,
+  onEdit,
+  onDelete,
+}: PlanMilestonesProps) {
   const todayOffset = todayOffsetPercent(goal);
 
   return (
     <Card className="shadow-xs">
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-3">
         <CardTitle className="text-sm font-medium">Plan & milestones</CardTitle>
-        <p className="text-xs text-muted-foreground">
-          1-{goal.Plan.toLowerCase()} plan · {formatDay(goal.StartAt)} –{" "}
-          {formatDay(goal.EndAt)}
-        </p>
+        <div className="flex items-center gap-3">
+          <p className="hidden text-xs text-muted-foreground sm:block">
+            1-{goal.Plan.toLowerCase()} plan · {formatDay(goal.StartAt)} –{" "}
+            {formatDay(goal.EndAt)}
+          </p>
+          <Button variant="outline" size="sm" onClick={onAdd}>
+            <Plus />
+            Add milestone
+          </Button>
+        </div>
       </CardHeader>
       <CardContent>
         <div className="relative pt-5">
@@ -79,6 +99,11 @@ export function PlanMilestones({ goal }: { goal: Goal }) {
           <span>{formatDay(goal.EndAt)}</span>
         </div>
 
+        {goal.Milestones.length === 0 && (
+          <p className="mt-4 border-t py-6 text-center text-sm text-muted-foreground">
+            No milestones yet. Add one to break this goal into steps.
+          </p>
+        )}
         <ol className="mt-4 divide-y border-t">
           {goal.Milestones.map((milestone, index) => {
             const items = milestoneTasks(goal, milestone);
@@ -107,6 +132,26 @@ export function PlanMilestones({ goal }: { goal: Goal }) {
                 <Badge variant={meta.variant} className="font-normal">
                   {meta.label}
                 </Badge>
+                <div className="flex shrink-0 gap-0.5">
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8"
+                    aria-label={`Edit ${milestone.Title}`}
+                    onClick={() => onEdit(milestone)}
+                  >
+                    <Pencil />
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    size="icon"
+                    className="size-8 text-destructive hover:text-destructive"
+                    aria-label={`Delete ${milestone.Title}`}
+                    onClick={() => onDelete(milestone)}
+                  >
+                    <Trash2 />
+                  </Button>
+                </div>
               </li>
             );
           })}

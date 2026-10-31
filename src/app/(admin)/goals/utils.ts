@@ -1,5 +1,6 @@
 import dayjs from "dayjs";
 import {
+  GoalPlan,
   GoalTaskStatus,
   MilestoneState,
   type Goal,
@@ -50,4 +51,37 @@ export function todayOffsetPercent(goal: Goal) {
   const offset = dayjs().diff(start);
   if (span <= 0 || offset < 0 || offset > span) return null;
   return (offset / span) * 100;
+}
+
+const MILESTONE_COUNT = 4;
+
+/**
+ * Default milestones for a new goal: four weeks for a 1-month plan, four
+ * quarters for a 1-year plan. The last one always closes on the goal's end.
+ */
+export function buildMilestones(
+  plan: GoalPlan,
+  startAt: string,
+  endAt: string,
+): GoalMilestone[] {
+  const start = dayjs(startAt).startOf("day");
+  const yearly = plan === GoalPlan.Year;
+
+  return Array.from({ length: MILESTONE_COUNT }, (_, index) => {
+    const from = yearly
+      ? start.add(index * 3, "month")
+      : start.add(index * 7, "day");
+    const to =
+      index === MILESTONE_COUNT - 1
+        ? dayjs(endAt)
+        : yearly
+          ? start.add((index + 1) * 3, "month").subtract(1, "day")
+          : from.add(6, "day");
+    return {
+      Id: `milestone-${crypto.randomUUID()}`,
+      Title: `${yearly ? "Quarter" : "Week"} ${index + 1}`,
+      StartAt: from.toISOString(),
+      EndAt: to.toISOString(),
+    };
+  });
 }

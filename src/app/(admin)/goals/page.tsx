@@ -12,6 +12,7 @@ import { useGoalsStore } from "@/store/client/goals-store";
 import { GoalCard } from "./components/goal-card";
 import { NewGoalDialog, type NewGoalInput } from "./components/goal-dialogs";
 import { GoalPlan, type Goal } from "./interface";
+import { buildMilestones } from "./utils";
 
 const GOAL_COLORS = Array.from(PRIMARY_COLORS.values(), (color) => color.value);
 
@@ -23,16 +24,17 @@ export default function GoalsPage() {
 
   const handleCreate = (input: NewGoalInput) => {
     const start = dayjs().startOf("day");
+    const endAt = start
+      .add(1, input.Plan === GoalPlan.Year ? "year" : "month")
+      .toISOString();
     const goal: Goal = {
       Id: `goal-${crypto.randomUUID()}`,
       ...input,
       Color: GOAL_COLORS[goals.length % GOAL_COLORS.length],
       Tags: [],
       StartAt: start.toISOString(),
-      EndAt: start
-        .add(1, input.Plan === GoalPlan.Year ? "year" : "month")
-        .toISOString(),
-      Milestones: [],
+      EndAt: endAt,
+      Milestones: buildMilestones(input.Plan, start.toISOString(), endAt),
       Tasks: [],
       Resources: [],
     };
