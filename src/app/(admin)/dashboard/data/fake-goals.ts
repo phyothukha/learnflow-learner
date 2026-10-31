@@ -1,4 +1,11 @@
 import dayjs from "dayjs";
+import { createFakeGoals as createGoals } from "@/app/(admin)/goals/data/fake-goals";
+import {
+  GoalPlan,
+  MilestoneState,
+  type Goal,
+} from "@/app/(admin)/goals/interface";
+import { goalProgress, milestoneState } from "@/app/(admin)/goals/utils";
 
 export interface DashboardGoal {
   Id: string;
@@ -20,73 +27,38 @@ export interface DashboardMilestone {
 }
 
 export function createFakeGoals(): DashboardGoal[] {
-  const today = dayjs().startOf("day");
-  return [
-    {
-      Id: "goal-n3",
-      Name: "Japanese N3",
-      Color: "#3b82f6",
-      Plan: "1 Year plan",
-      DoneTasks: 9,
-      TotalTasks: 32,
-      DueAt: today.add(9, "month").toISOString(),
-    },
-    {
-      Id: "goal-fe",
-      Name: "ITPEC FE Certification",
-      Color: "#10b981",
-      Plan: "1 Month plan",
-      DoneTasks: 5,
-      TotalTasks: 17,
-      DueAt: today.add(16, "day").toISOString(),
-    },
-    {
-      Id: "goal-workout",
-      Name: "Daily Workout",
-      Color: "#f59e0b",
-      Plan: "1 Month plan",
-      DoneTasks: 10,
-      TotalTasks: 30,
-      DueAt: today.add(9, "day").toISOString(),
-    },
-    {
-      Id: "goal-coursework",
-      Name: "Semester coursework",
-      Color: "#8b5cf6",
-      Plan: "1 Month plan",
-      DoneTasks: 4,
-      TotalTasks: 9,
-      DueAt: today.add(20, "day").toISOString(),
-    },
-  ];
+  return createGoals().map((goal) => {
+    const { done, total } = goalProgress(goal);
+    return {
+      Id: goal.Id,
+      Name: goal.Name,
+      Color: goal.Color,
+      Plan: `1 ${goal.Plan === GoalPlan.Year ? "Year" : "Month"} plan`,
+      DoneTasks: done,
+      TotalTasks: total,
+      DueAt: goal.EndAt,
+    };
+  });
 }
 
+/** Current and next milestone of every goal, soonest first. */
 export function createFakeMilestones(): DashboardMilestone[] {
   const today = dayjs().startOf("day");
-  return [
-    {
-      Id: "ms-networks",
-      Title: "Networks & databases",
-      GoalName: "ITPEC FE Certification",
-      Color: "#10b981",
-      StartAt: today.subtract(6, "day").toISOString(),
-      EndAt: today.add(1, "day").toISOString(),
-    },
-    {
-      Id: "ms-sustain",
-      Title: "Sustain",
-      GoalName: "Daily Workout",
-      Color: "#f59e0b",
-      StartAt: today.add(1, "day").toISOString(),
-      EndAt: today.add(9, "day").toISOString(),
-    },
-    {
-      Id: "ms-kanji",
-      Title: "N4 grammar & 300 kanji",
-      GoalName: "Japanese N3",
-      Color: "#3b82f6",
-      StartAt: today.add(17, "day").toISOString(),
-      EndAt: today.add(3, "month").toISOString(),
-    },
-  ];
+  return createGoals()
+    .flatMap((goal: Goal) =>
+      goal.Milestones.filter(
+        (milestone) =>
+          milestoneState(goal, milestone) !== MilestoneState.Achieved &&
+          !dayjs(milestone.EndAt).isBefore(today),
+      ).map((milestone) => ({
+        Id: milestone.Id,
+        Title: milestone.Title,
+        GoalName: goal.Name,
+        Color: goal.Color,
+        StartAt: milestone.StartAt,
+        EndAt: milestone.EndAt,
+      })),
+    )
+    .sort((a, b) => dayjs(a.EndAt).valueOf() - dayjs(b.EndAt).valueOf())
+    .slice(0, 3);
 }
