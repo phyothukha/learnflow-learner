@@ -51,7 +51,7 @@ export function ScheduleFilters<S extends string, C extends string>({
       value={search}
       onChange={onSearchChange}
       placeholder={searchPlaceholder}
-      className="min-w-0 flex-1 sm:w-56 md:flex-none"
+      className="flex-1 md:flex-none"
     />
   );
   const chips = (
@@ -73,18 +73,24 @@ export function ScheduleFilters<S extends string, C extends string>({
           className="scrollbar-none -mb-px max-w-full overflow-x-auto border-b-0"
           tabClassName="px-3"
         />
-        <div className="my-2 hidden md:flex">{searchField}</div>
+        <div className="my-2 hidden shrink-0 lg:flex">{searchField}</div>
       </div>
 
-      <div className="flex items-center gap-2 border-b px-3 py-2 md:hidden">
+      {/* Mobile: search + filter popover. Tablet: search + inline chips. */}
+      <div className="flex items-center gap-2 border-b px-3 py-2 md:flex-wrap md:gap-x-3 md:px-4 lg:hidden">
         {searchField}
+        {categories.length > 0 && (
+          <div className="hidden flex-wrap items-center gap-2 md:flex">
+            {chips}
+          </div>
+        )}
         {categories.length > 0 && (
           <Popover>
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
                 size="sm"
-                className="relative shrink-0"
+                className="relative shrink-0 md:hidden"
                 aria-label={`Filter ${categoriesLabel.toLowerCase()}`}
               >
                 <SlidersHorizontal className="size-4" />
@@ -106,7 +112,7 @@ export function ScheduleFilters<S extends string, C extends string>({
       </div>
 
       {categories.length > 0 && (
-        <div className="hidden flex-wrap items-center gap-2 border-b px-4 py-2.5 md:flex">
+        <div className="hidden flex-wrap items-center gap-2 border-b px-4 py-2.5 lg:flex">
           <span className="mr-1 shrink-0 text-xs font-medium text-muted-foreground">
             {categoriesLabel}
           </span>

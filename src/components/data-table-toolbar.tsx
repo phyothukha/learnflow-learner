@@ -37,7 +37,7 @@ export function DataTableToolbar({
         )}
       </div>
       {(filters || onSearchChange) && (
-        <div className="flex w-full flex-wrap items-center gap-2 sm:w-auto">
+        <div className="flex w-full flex-wrap items-center gap-2 md:w-auto">
           {filters}
           {onResetFilters && (
             <Button
@@ -55,7 +55,7 @@ export function DataTableToolbar({
               value={search ?? ""}
               onChange={onSearchChange}
               placeholder={searchPlaceholder}
-              className="sm:w-64"
+              className="flex-1 basis-48 md:flex-none"
             />
           )}
         </div>

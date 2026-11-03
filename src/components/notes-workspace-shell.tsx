@@ -99,7 +99,7 @@ export function NotesWorkspaceShell({
               value={search}
               onChange={onSearchChange}
               placeholder={searchPlaceholder}
-              className="flex-1 sm:w-auto"
+              className="flex-1"
             />
             {canCreate && (
               <Button

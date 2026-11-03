@@ -104,9 +104,7 @@ export default function DashboardPage() {
     <div className="flex flex-col gap-4 pb-6">
       <PageHeader
         title={`${greetingForHour(dayjs().hour())}, ${firstName}`}
-        description={dayjs().format(
-          "dddd, MMMM D · Here’s your day at a glance.",
-        )}
+        description={`${dayjs().format("dddd, MMMM D")} · Here’s your day at a glance.`}
         actions={
           <div className="flex flex-wrap gap-2">
             <Button variant="secondary" asChild>

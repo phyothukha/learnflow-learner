@@ -24,7 +24,8 @@ export function SearchInput({
   return (
     <div
       className={cn(
-        "relative min-w-0 w-full rounded-full sm:w-72",
+        // Full width on mobile, one fixed width from tablet up — keep every search the same size.
+        "relative w-full min-w-0 rounded-full md:w-64",
         "has-[input:focus-visible]:ring-[3px] has-[input:focus-visible]:ring-ring/50",
         className,
       )}

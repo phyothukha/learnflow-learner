@@ -10,6 +10,7 @@ import {
 } from "@/components/animated-tabs";
 import { Button } from "@/components/ui/button";
 import { useIsMobile } from "@/hooks/use-mobile";
+import { cn } from "@/lib/utils";
 import { CalendarMode, startOfWeek, weekDays } from "@/utils/calendar";
 import { CalendarMonthGrid } from "./calendar-month-grid";
 import {
@@ -32,6 +33,10 @@ const CALENDAR_MODES: AnimatedTab<CalendarMode>[] = [
     </>
   ),
 }));
+
+/** Ghost Button tuned to match an AnimatedTabs pill tab (height, text, hover). */
+const PILL_BUTTON =
+  "h-6 text-xs text-muted-foreground hover:bg-muted hover:text-foreground active:bg-muted";
 
 function formatRange(cursor: Dayjs, mode: CalendarMode) {
   if (mode === CalendarMode.Day) return cursor.format("ddd, DD MMM YYYY");
@@ -104,35 +109,36 @@ export function CalendarView<T extends CalendarEvent>({
             variant={AnimatedTabsVariant.Pill}
             tabClassName="px-2.5 py-1 text-xs md:px-3"
           />
-          <div className="flex items-center gap-1">
+          {/* Same pill container as the Day / Week / Month tabs beside it. */}
+          <div className="inline-flex items-center rounded-lg border bg-card p-1 shadow-xs">
             <Button
-              variant="outline"
-              size="icon"
-              className="size-8"
+              variant="ghost"
+              size="icon-xs"
+              className={PILL_BUTTON}
               aria-label="Previous"
               onClick={() => onCursorChange(cursor.subtract(1, mode))}
             >
               <ChevronLeft className="size-4" />
             </Button>
             <Button
-              variant="outline"
-              size="sm"
-              className="h-8 px-2 text-xs md:px-3.5 md:text-sm"
+              variant="ghost"
+              size="xs"
+              className={cn(PILL_BUTTON, "px-2.5 md:px-3")}
               onClick={() => onCursorChange(dayjs().startOf("day"))}
             >
               Today
             </Button>
             <Button
-              variant="outline"
-              size="icon"
-              className="size-8"
+              variant="ghost"
+              size="icon-xs"
+              className={PILL_BUTTON}
               aria-label="Next"
               onClick={() => onCursorChange(cursor.add(1, mode))}
             >
               <ChevronRight className="size-4" />
             </Button>
           </div>
-          <span className="hidden h-8 items-center gap-2 rounded-md border px-3 text-xs font-medium tabular-nums md:inline-flex">
+          <span className="hidden h-[34px] items-center gap-2 rounded-lg border bg-card px-3 text-xs font-medium tabular-nums shadow-xs md:inline-flex">
             <CalendarDays className="size-3.5 text-muted-foreground" />
             {formatRange(cursor, mode)}
           </span>

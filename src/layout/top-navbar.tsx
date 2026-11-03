@@ -134,11 +134,11 @@ export function TopNavbar() {
   return (
     <>
       <header className="sticky top-0 z-20 flex h-14 shrink-0 items-center justify-between gap-3 border-b bg-background px-4 md:px-6">
-        <div className="flex min-w-0 items-center gap-2 md:gap-8">
+        <div className="flex min-w-0 items-center gap-2 lg:gap-6 xl:gap-8">
           <Button
             variant="ghost"
             size="icon"
-            className="-ml-2 size-9 md:hidden"
+            className="-ml-2 size-9 lg:hidden"
             aria-label="Open menu"
             onClick={() => setMenuOpen(true)}
           >
@@ -147,7 +147,7 @@ export function TopNavbar() {
           <Brand />
           <nav
             ref={navRef}
-            className="relative hidden h-14 items-stretch gap-1 md:flex"
+            className="relative hidden h-14 min-w-0 items-stretch gap-1 lg:flex"
           >
             <span
               aria-hidden
@@ -170,19 +170,22 @@ export function TopNavbar() {
                   href={item.href}
                   data-nav-item={item.href}
                   aria-current={active ? "page" : undefined}
+                  aria-label={item.title}
+                  title={item.title}
                   onClick={() => {
                     if (item.href !== routeHref)
                       setPending({ href: item.href, from: pathname });
                   }}
                   className={cn(
-                    "flex items-center gap-2 px-3 font-poppins text-sm font-medium transition-colors duration-200 outline-none focus-visible:bg-accent",
+                    "flex shrink-0 items-center gap-2 px-2.5 font-poppins text-sm font-medium transition-colors duration-200 outline-none focus-visible:bg-accent xl:px-3",
                     active
                       ? "text-primary"
                       : "text-muted-foreground hover:text-foreground",
                   )}
                 >
                   <item.icon className="size-4" />
-                  {item.title}
+                  {/* Icon-only on small desktops so the links never run under the actions. */}
+                  <span className="hidden xl:inline">{item.title}</span>
                 </Link>
               );
             })}

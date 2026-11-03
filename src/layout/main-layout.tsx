@@ -12,7 +12,7 @@ export function MainLayout({ children }: PropsWithChildren) {
       {/* Absolute fill so h-full children (e.g. DataTable) get a definite height on mobile too */}
       <main className="relative min-h-0 flex-1">
         <div className="absolute inset-0 overflow-y-auto p-4 md:p-6">
-          <div className="mx-auto h-full w-full max-w-[1400px]">{children}</div>
+          <div className="mx-auto h-full w-full ">{children}</div>
         </div>
       </main>
     </div>

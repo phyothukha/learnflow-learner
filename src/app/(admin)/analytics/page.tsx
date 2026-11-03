@@ -14,7 +14,10 @@ import { createFakeActivity } from "./data/fake-activity";
 import { AnalyticsKpis } from "./components/analytics-kpis";
 import { ByGoalCard } from "./components/by-goal-card";
 import { PlannedVsDoneCard } from "./components/planned-vs-done-card";
-import { RecentWeeksCard } from "./components/recent-weeks-card";
+import {
+  ActivityHeatmapCard,
+  ActivitySummaryCard,
+} from "./components/recent-weeks-card";
 import {
   AnalyticsPeriod,
   PERIOD_NOUN,
@@ -104,13 +107,17 @@ export default function AnalyticsPage() {
         ]}
       />
 
-      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-[minmax(0,3fr)_minmax(0,2fr)]">
         <PlannedVsDoneCard buckets={buckets} range={range} period={period} />
+        <ActivitySummaryCard cells={heatmap} />
+      </div>
+      {/* Heatmap gets the wider column so its 24 square columns stay readable. */}
+      <div className="grid flex-1 grid-cols-1 gap-4 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         <div className="min-w-0 [&>*]:h-full">
           <ByGoalCard goals={goals} items={items} period={period} />
         </div>
+        <ActivityHeatmapCard cells={heatmap} />
       </div>
-      <RecentWeeksCard cells={heatmap} />
     </div>
   );
 }

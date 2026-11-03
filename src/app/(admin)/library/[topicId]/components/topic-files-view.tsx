@@ -108,7 +108,6 @@ export function TopicFilesView({
             value={search}
             onChange={setSearch}
             placeholder="Search files…"
-            className="sm:w-64"
           />
         </div>
 
